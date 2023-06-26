@@ -16,36 +16,20 @@ afterAll(() => {
 
 describe("GET /api/topics", () => {
     
-    test('200: should return an array', () => { 
-        return request(app)
-        .get("/api/topics")
-        .expect(200)
-        .then(({ body }) => {
-            const { topics } = body;
-            expect(Array.isArray(topics)).toBe(true);
-            });
-        });
+   
 
-    test('200: should return an array with 3 topic objects', () => { 
-        return request(app)
-        .get("/api/topics")
-        .expect(200)
-        .then(({ body }) => {
-            const { topics } = body;
-            expect(topics.length).toBe(3);
-            });
-        });
-
-    test("200: should respond with an array with all topic objects, each of which will have slug and description properties", () => {
+    test("200: should respond with an array with 3 topic objects, each of which will have slug and description properties", () => {
         return request(app)
             .get("/api/topics")
             .expect(200)
             .then(({ body }) => {
                 const { topics } = body;
-                topics.forEach((el) => {
-                    expect(typeof el).toBe('object');
-                    expect(el).toHaveProperty("slug"), expect.any(String);
-                    expect(el).toHaveProperty("description"), expect.any(String);
+                expect(Array.isArray(topics)).toBe(true)
+                expect(topics.length).toBe(3)
+                topics.forEach((topic) => {
+                    expect(typeof topic).toBe('object');
+                    expect(topic).toHaveProperty("slug"), expect.any(String);
+                    expect(topic).toHaveProperty("description"), expect.any(String);
                 });
             });
     })
