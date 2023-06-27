@@ -3,6 +3,7 @@ const app = require("../app");
 const db = require("../db/connection"); 
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
+const endpointsData = require('../endpoints.json')
 
 
 
@@ -15,8 +16,6 @@ afterAll(() => {
 });
 
 describe("GET /api/topics", () => {
-    
-   
 
     test("200: should respond with an array with 3 topic objects, each of which will have slug and description properties", () => {
         return request(app)
@@ -47,9 +46,17 @@ describe("GET /api/topics", () => {
                         const { msg } = body;
                         expect(msg).toBe('Server Error');
                     });
-            })
-           
-
+            }) 
     })
+})
 
+describe('GET /api', () => { 
+    test('200: should return a json object describing all the available endpoints on the API', () => { 
+        return request(app)
+        .get('/api')
+        .expect(200)
+        .then(({body})=>{
+           expect(body.endpoints).toEqual(endpointsData);
+        })       
+    })
 })
