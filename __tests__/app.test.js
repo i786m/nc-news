@@ -98,3 +98,61 @@ describe('GET /api/articles/:article_id', () => {
       });
      })
 })
+
+describe("GET /api/articles", () => {
+
+	test("200: should respond with an array of all articles", () => {
+		return request(app)
+			.get("/api/articles")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				expect(articles).toBeInstanceOf(Array);
+				expect(articles.length).toBe(13);
+			});
+	});
+	
+    test("200: should respond with an array of all article objects with each having the following properties: author, title, article_id, topic, created_at, votes, article_img_url, comment_count.", () => {
+		return request(app)
+			.get("/api/articles")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				articles.forEach(article=>{
+                    expect(article).toMatchObject({
+						author: expect.any(String),
+						title: expect.any(String),
+						article_id: expect.any(Number),
+						topic: expect.any(String),
+						created_at: expect.any(String),
+						votes: expect.any(Number),
+						article_img_url: expect.any(String),
+						comment_count: expect.any(String),
+					});
+                })
+			});
+	});
+    
+    test("200: should respond with an array containing all articles sorted by created_at in descending order.", () => {
+		return request(app)
+			.get("/api/articles")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				expect(articles).toBeSortedBy("created_at", { descending: true });
+			});
+	});
+
+    test("200: should respond with an array containing all article objects with each not having a body property.", () => {
+		return request(app)
+			.get("/api/articles")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				articles.forEach(article=>{
+                    expect(article.hasOwnProperty(body)).toBe(false);
+                })
+			});
+	});
+
+});
