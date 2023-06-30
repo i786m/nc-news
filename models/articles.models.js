@@ -1,4 +1,5 @@
 const db = require('../db/connection');
+const format = require('pg-format')
 
 exports.selectArticleById = (article_id) => {
 	return db
@@ -22,4 +23,13 @@ exports.selectArticles = () => {
       ORDER BY articles.created_at DESC;`
 		)
 		.then(({ rows }) => rows);
+};
+
+exports.selectArticleComments = (article_id) => {
+
+
+	const queryString = `SELECT comment_id, votes, created_at,author,body,article_id FROM comments WHERE article_id=$1 ORDER BY created_at DESC;`
+
+	return db.query(queryString,[article_id]).then(({rows}) => rows)
+
 };
