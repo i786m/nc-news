@@ -1,4 +1,9 @@
-const { selectArticleById, selectArticles } = require('../models/articles.models');
+const { checkExists } = require('../db/seeds/utils');
+const {
+	selectArticleById,
+	selectArticles,
+	selectArticleComments,
+} = require('../models/articles.models');
 
 exports.getArticlesById = (req, res, next) => {
 	const { article_id } = req.params;
@@ -15,4 +20,17 @@ exports.getArticles = (req, res, next) => {
 			res.status(200).send({ articles });
 		})
 		.catch(next);
+};
+
+exports.getArticleComments = (req, res, next) => {
+	const { article_id } = req.params;
+	
+
+	const promises = [selectArticleComments(article_id), checkExists('articles', 'article_id', article_id)]
+
+	Promise.all(promises)
+	.then(([comments, doesExist])=>{
+		res.status(200).send({comments})
+	})
+	.catch(next)
 };
