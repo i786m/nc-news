@@ -1,29 +1,42 @@
-const express = require('express');
-const { getTopics } = require( './controllers/topics.controllers' );
-const { handleServerErrors, handlePsqlErrors, handleCustomErrors } = require( './errors/errors' );
-const { getApiInfo } = require( './controllers/api.controllers' );
-const { getArticlesById, getArticles, getArticleComments } = require( './controllers/articles.controllers' );
+const express = require("express");
+const { getTopics } = require("./controllers/topics.controllers");
+const {
+  handleServerErrors,
+  handlePsqlErrors,
+  handleCustomErrors,
+} = require("./errors/errors");
+const { getApiInfo } = require("./controllers/api.controllers");
+const {
+  getArticlesById,
+  getArticles,
+  getArticleComments,
+  postComment,
+} = require("./controllers/articles.controllers");
 
-const app = express()
+const app = express();
 
-app.get('/api', getApiInfo)
+app.use(express.json());
 
-app.get('/api/topics', getTopics)
+app.get("/api", getApiInfo);
 
-app.get('/api/articles/:article_id', getArticlesById)
+app.get("/api/topics", getTopics);
 
-app.get('/api/articles', getArticles)
+app.get("/api/articles/:article_id", getArticlesById);
 
-app.get('/api/articles/:article_id/comments', getArticleComments)
+app.get("/api/articles", getArticles);
 
-app.all('*', (_,res)=>{
-    res.status(404).send({msg: 'Not Found'})
-})
+app.get("/api/articles/:article_id/comments", getArticleComments);
 
-app.use(handlePsqlErrors)
+app.post("/api/articles/:article_id/comments", postComment);
 
-app.use(handleCustomErrors)
+app.all("*", (_, res) => {
+  res.status(404).send({ msg: "Not Found" });
+});
 
-app.use(handleServerErrors)
+app.use(handlePsqlErrors);
 
-module.exports = app
+app.use(handleCustomErrors);
+
+app.use(handleServerErrors);
+
+module.exports = app;

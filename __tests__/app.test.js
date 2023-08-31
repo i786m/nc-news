@@ -220,3 +220,74 @@ describe('GET /api/articles/:article_id/comments', () => {
 			});
 	});
 });
+
+describe('POST /api/articles/:article_id/comments', () => { 
+	test('201: should update article with only relevant properties of a new comment and respond with an object of the posted comment', () => { 
+		const testComment = {
+			username: "lurker",
+			body: 'testing posted comment',
+		}
+
+		return request(app)
+            .post("/api/articles/1/comments")
+            .send(testComment)
+            .expect(201)
+            .then(({ body }) => {
+                const { postedComment } = body;
+
+                expect(postedComment).toBeInstanceOf(Object);
+
+                expect(postedComment).toMatchObject({
+                    comment_id: 19,
+                    body: "testing posted comment",
+                    article_id: 1,
+                    author: "lurker",
+                    votes: 0,
+                    created_at: expect.any(String),
+                });
+            });
+	 })
+	 
+	 test("400: should respond with bad request when trying to post a comment with missing fields", () => {
+        const testComment = {
+			username:'lurker',
+		}
+
+        return request(app)
+            .post("/api/articles/1/comments")
+            .send(testComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad Request");
+            });
+    });
+
+    test("400: should respond with bad request when article id is an invalid type", () => {
+        const testComment = {
+			username: 'test',
+			body: 'testing posted comments'
+		}
+        return request(app)
+            .post("/api/articles/banana/comments")
+            .send(testComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Bad Request");
+            });
+    })
+
+	test("404: should respond with not found if article id is a valid type but article doesnt exist ", () => { 
+		const testComment = {
+			username: 'test',
+			body: 'testing posted comments'
+		}
+        return request(app)
+            .post("/api/articles/45545654/comments")
+            .send(testComment)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Not found");
+            });
+	 })
+ })
+
