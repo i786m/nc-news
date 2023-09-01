@@ -55,3 +55,9 @@ exports.insertComment = (articleId, newComment) => {
         return commentFromDB.rows[0];
     });
 };
+
+
+exports.updateArticle = (article_id, inc_votes) => {
+    const queryString = `UPDATE articles SET votes=votes+%L WHERE article_id=%L RETURNING *;`
+    return db.query(format(queryString, inc_votes, article_id)).then(({ rows }) => rows[0]);
+}
