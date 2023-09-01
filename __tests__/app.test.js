@@ -291,3 +291,63 @@ describe('POST /api/articles/:article_id/comments', () => {
 	 })
  })
 
+describe('CORE: PATCH /api/articles/:article_id', () => {
+	test('200: should increase article votes and respond with updated article if provided valid positive input', () => {
+		return request(app)
+		.patch('/api/articles/1')
+		.send({ inc_votes: 100 })
+		.expect(200)
+		.then(({ body }) => {
+			const expected ={
+				title: "Living in the shadow of a great man",
+				topic: "mitch",
+				author: "butter_bridge",
+				body: "I find this existence challenging",
+				created_at: "2020-07-09T20:11:00.000Z",
+				votes: 200,
+				article_id: 1,
+				article_img_url:
+				  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+			  }
+            const { article } = body;
+			expect(article).toBeInstanceOf(Object);
+			expect(article).toEqual(expected);
+        });
+	})
+	test('200: should decrease article votes and respond with updated article if provided valid negative input', () => {
+		return request(app)
+		.patch('/api/articles/1')
+		.send({ inc_votes: -40 })
+		.expect(200)
+		.then(({ body }) => {
+			
+            const { article } = body;
+			expect(article.votes).toBe(60);
+        });
+	})
+	test('400: should respond with bad request when provided article id is not valid', () =>{
+		return request(app)
+		.patch('/api/articles/bananas')
+		.send({ inc_votes: 100 })
+		.expect(400).then(({ body }) => {
+			expect(body.msg).toBe('Bad Request');
+		});
+	})
+	test('400: should respond with bad request when provided invalid body', () =>{
+		return request(app)
+		.patch('/api/articles/1')
+		.send({ bananas: 100 })
+		.expect(400).then(({ body }) => {
+			expect(body.msg).toBe('Bad Request');
+		});
+	})
+	test('404: should respond with not found when provided article id is valid but non-existent', () =>{
+		return request(app)
+		.patch('/api/articles/555')
+		.send({ inc_votes: 100 })
+		.expect(404).then(({ body }) => {
+            expect(body.msg).toBe('Not found');
+        });
+	})
+	
+})
