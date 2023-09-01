@@ -1,5 +1,6 @@
 const db = require('../db/connection');
 const format = require('pg-format')
+const { query } = require("express");
 
 exports.selectArticleById = (article_id) => {
 	return db
@@ -26,10 +27,31 @@ exports.selectArticles = () => {
 };
 
 exports.selectArticleComments = (article_id) => {
-
-
+	
 	const queryString = `SELECT comment_id, votes, created_at,author,body,article_id FROM comments WHERE article_id=$1 ORDER BY created_at DESC;`
 
 	return db.query(queryString,[article_id]).then(({rows}) => rows)
 
+};
+
+exports.checkArticleIdExists = (articleId) => {
+    const queryString = `SELECT author, title, article_id, body, topic, created_at, votes,article_img_url FROM articles WHERE article_id=%L;`;
+
+    return db.query(format(queryString, articleId)).then(({ rows }) => {
+        if (!rows.length) {
+            return Promise.reject({ status: 404, msg: "Not found" });
+        } else {
+            return true;
+        }
+    });
+};
+
+exports.insertComment = (articleId, newComment) => {
+    const queryString = `INSERT INTO comments (body, article_id, author) 
+        VALUES %L RETURNING *;`;
+
+    const newCommentValues = [[newComment.body, articleId, newComment.username]];
+    return db.query(format(queryString, newCommentValues)).then((commentFromDB) => {
+        return commentFromDB.rows[0];
+    });
 };
